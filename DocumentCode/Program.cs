@@ -1,13 +1,13 @@
 ﻿using System.Reflection;
+using DocumentTool;
+
 namespace DocumentCode
 {
     internal class Program
     {      
-
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello, World!");
-            DocumentAttribute.DisplayAttributes(typeof(Person));
+            DocumentAttribute.GetDocs(typeof(SamplePerson));
         }
     }
 }

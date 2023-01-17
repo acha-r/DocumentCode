@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace DocumentCode
+namespace DocumentTool
 {
     [Document("This is a human being")]
-    internal class Person
+    public class SamplePerson
     {
 
         [Document("Refers to how long this person has been on earth", "Takes in an integer")]
@@ -16,12 +12,12 @@ namespace DocumentCode
         [Document("Obvious biological traits associated with this person", "Takes in an enum")]
         public GenderEnum Gender { get; set; }
 
-        public Person()
+        public SamplePerson()
         {
 
         }
 
-        public Person(int age, GenderEnum gender)
+        public SamplePerson(int age, GenderEnum gender)
         {
             Age = age;
             Gender = gender;
@@ -29,7 +25,7 @@ namespace DocumentCode
         }
 
         [Document("Provides valid gender options a person can be")]
-        internal enum GenderEnum
+        public enum GenderEnum
         {
             Male,
             Female
@@ -45,4 +41,5 @@ namespace DocumentCode
             else Console.WriteLine("We have a {0} year old female", age);
         }
     }
+
 }

@@ -1,9 +1,12 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Text;
 
-namespace DocumentCode
+namespace DocumentTool
 {
     [AttributeUsage(AttributeTargets.All, Inherited = false, AllowMultiple = true)]
-    internal class DocumentAttribute : Attribute
+    public class DocumentAttribute : Attribute
     {
         public string Description { get; set; }
         public string Input { get; set; }
@@ -14,17 +17,24 @@ namespace DocumentCode
             Description = description;
         }
 
-        public DocumentAttribute(string description, string input = "Input", string output = "Output")
+        public DocumentAttribute(string description, string input = "", string output = "")
         {
             Description = description;
             Input = input;
             Output = output;
         }
 
-        public static void DisplayAttributes(Type classtype)
+        public static void GetDocs(Type classtype)
+        {
+            DisplayClassAttr(classtype);
+            DisplayPropAttr(classtype);
+            DisplayMethodAttr(classtype);
+        }
+
+        public static void DisplayClassAttr(Type classtype)
         {
             Console.WriteLine("Assembly: {0}", Assembly.GetExecutingAssembly());
-            Console.WriteLine("\nClass: \n{0}", classtype.Name);
+            Console.WriteLine("\nClass: \n\n{0}", classtype.Name);
 
             object[] classAttr = classtype.GetCustomAttributes(true);
 
@@ -33,13 +43,14 @@ namespace DocumentCode
                 if (item is DocumentAttribute)
                 {
                     DocumentAttribute doc = (DocumentAttribute)item;
-                    Console.WriteLine(@"
-    Description:
-        {0}", doc.Description);
+                    Console.WriteLine("\nDescription:\n\t{0}", doc.Description);
                 }
             }
+        }
 
-            Console.WriteLine("\nProperties: ");
+        public static void DisplayPropAttr(Type classtype)
+        {
+            Console.WriteLine("\n\nProperties: ");
             Console.WriteLine();
 
             PropertyInfo[] properties = classtype.GetProperties();
@@ -53,18 +64,17 @@ namespace DocumentCode
                     if (item is DocumentAttribute)
                     {
                         DocumentAttribute doc = (DocumentAttribute)item;
-                        Console.WriteLine(@"{0}
-    Description:
-        {1}
-    Input:
-        {2}", properties[i].Name, doc.Description, doc.Input);
+                        Console.WriteLine("{0}\nDescription:\n\t{1}\nInput:\n\t{2}\n", properties[i].Name, doc.Description, doc.Input);
                     }
                 }
             }
+        }
 
+        public static void DisplayMethodAttr(Type classtype)
+        {
+            Console.WriteLine("\nMethods:\n");
             MethodInfo[] methods = classtype.GetMethods();
 
-            Console.WriteLine("\nMethods:\n");
 
             for (int i = 0; i < methods.GetLength(0); i++)
             {
@@ -75,17 +85,10 @@ namespace DocumentCode
                     if (item is DocumentAttribute)
                     {
                         DocumentAttribute doc = (DocumentAttribute)item;
-                        Console.WriteLine(@"{0}
-    Description:
-        {1}
-    Input:
-        {2}
-    Output:
-        {3}", methods[i].Name, doc.Description, doc.Input, doc.Output);
+                        Console.WriteLine("{0}\nDescription:\n\t{1}\nInput:\n\t{2}", methods[i].Name, doc.Description, doc.Input);
                     }
                 }
             }
-
         }
     }
 }
