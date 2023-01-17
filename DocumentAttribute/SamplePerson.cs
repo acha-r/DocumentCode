@@ -5,6 +5,12 @@ namespace DocumentTool
     [Document("This is a human being")]
     public class SamplePerson
     {
+ 
+        public SamplePerson(int age, GenderEnum gender)
+        {
+            Age = age;
+            Gender = gender;
+        }
 
         [Document("Refers to how long this person has been on earth", "Takes in an integer")]
         public int Age { get; set; }
@@ -12,17 +18,6 @@ namespace DocumentTool
         [Document("Obvious biological traits associated with this person", "Takes in an enum")]
         public GenderEnum Gender { get; set; }
 
-        public SamplePerson()
-        {
-
-        }
-
-        public SamplePerson(int age, GenderEnum gender)
-        {
-            Age = age;
-            Gender = gender;
-
-        }
 
         [Document("Provides valid gender options a person can be")]
         public enum GenderEnum
