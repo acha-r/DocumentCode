@@ -7,7 +7,7 @@ namespace DocumentCode
     {      
         static void Main(string[] args)
         {
-            DocumentAttribute.GetDocs(typeof(SamplePerson));
+            AttributesDisplay.GetDocs();
         }
     }
 }
