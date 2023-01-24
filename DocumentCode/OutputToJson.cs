@@ -27,8 +27,11 @@ namespace DocumentCode
                 DisplayMethodAttr(t);
                 Console.WriteLine();
 
-                responses.Add(response);
-                response = new();
+               if (!string.IsNullOrEmpty(response.Name))
+                {
+                    responses.Add(response);
+                    response = new();
+                }              
             }
             JsonFileUtils.WriteToJsonFile(responses, fileName);
         }
