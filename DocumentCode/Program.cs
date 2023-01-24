@@ -11,7 +11,7 @@ namespace DocumentCode
         {
             //AttributesDisplay.GetDocs();
            // OutputToTxt.GetDocs();
-            //OutputToJson.GetDocs();            
+            OutputToJson.GetDocs();            
         }
     }
 }

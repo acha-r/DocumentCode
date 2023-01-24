@@ -1,14 +1,13 @@
 ﻿using DocumentTool;
 using System.Reflection;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using System.Xml;
 
 namespace DocumentCode
 {
     internal class OutputToJson
     {
-        static List<Response> response = new();
+        private static ResponseClassJson response = new();
+        private static List<ResponseClassJson> responses = new();
+
         static string fileName = @"C:\Users\USER\Desktop\GetDocs.json";
 
         internal static void GetDocs()
@@ -27,29 +26,21 @@ namespace DocumentCode
                 DisplayPropAttr(t);
                 DisplayMethodAttr(t);
                 Console.WriteLine();
-            }
-           JsonFileUtils.WriteToJsonFile(response, fileName);
-        }
 
+                responses.Add(response);
+                response = new();
+            }
+            JsonFileUtils.WriteToJsonFile(responses, fileName);
+        }
 
         public static void DisplayTypeAttr(Type type)
         {
             DocumentAttribute documentAttribute = (DocumentAttribute)type.GetCustomAttribute(typeof(DocumentAttribute))!;
 
-            if (documentAttribute != null && type.IsClass)
+            if (documentAttribute is not null)
             {
-                var res = new Response(documentAttribute.Description, type.Name);                
-                response.Add(res);
-            }
-            else if (documentAttribute != null && type.IsEnum)
-            {
-                var res = new Response(documentAttribute.Description, type.Name);
-                response.Add(res);
-            }
-            else if (documentAttribute != null && type.IsInterface)
-            {
-                var res = new Response(documentAttribute.Description, type.Name);
-                response.Add(res);
+                response.Name = type.Name;
+                response.Description = documentAttribute.Description;
             }
         }
 
@@ -61,11 +52,14 @@ namespace DocumentCode
             {
                 var documentAttribute = (DocumentAttribute)constructor.GetCustomAttribute(typeof(DocumentAttribute));
 
-                if (documentAttribute != null )
+                if (documentAttribute != null)
                 {
-                    var res = new Response(documentAttribute.Description, constructor.Name);
-                    response.Add(res);
-                }             
+                    response.Constructor = new()
+                    {
+                        Name = constructor.Name,
+                        Description = documentAttribute.Description
+                    };
+                }
             }
         }
 
@@ -79,8 +73,12 @@ namespace DocumentCode
 
                 if (documentAttribute != null)
                 {
-                    var res = new Response(documentAttribute.Description, property.Name);
-                    response.Add(res);
+                    response.Properties.Add(new()
+                    {
+                        Name = property?.Name,
+                        Description = documentAttribute?.Description
+
+                    });
                 }
             }
         }
@@ -95,54 +93,16 @@ namespace DocumentCode
 
                 if (documentAttribute != null)
                 {
-                    var res = new Response()
+                    response.Methods.Add(new()
                     {
+                        Name = method.Name,
                         Description = documentAttribute.Description,
-                        Name = method.Name
-                    };
-                    response.Add(res);
-                    JsonSerializer.Serialize(response);
+                        Input = string.IsNullOrEmpty(documentAttribute?.Input) ? string.Empty: documentAttribute?.Input,
+                        Output = string.IsNullOrEmpty(documentAttribute?.Output) ? string.Empty : documentAttribute?.Output,
+                    });
                 }
-                if (!string.IsNullOrEmpty(documentAttribute?.Input))
-                {
-                    var res = new Response()
-                    {
-                        Input = documentAttribute.Input
-                    };
-                    response.Add(res);
-                    JsonSerializer.Serialize(response);
-                }
-                if (!string.IsNullOrEmpty(documentAttribute?.Output))
-                {
-                    var res = new Response()
-                    {
-                        Output = documentAttribute.Output
-                    };
-                    response.Add(res);
-                    JsonSerializer.Serialize(response);
-                }
-            }
-        }
-
-        public class Response
-        {
-            public string Name { get; set; }
-            public string Description { get; set; }
-            public string Input { get; set; }
-            public string Output { get; set; }
-
-            public Response()
-            {
-
-            }
-            public Response(string name, string description, string input = "", string output ="")
-            {
-                Name = name;
-                Description = description;
-                Input = input;
-                Output = output;
             }
         }
     }
-    
 }
+
