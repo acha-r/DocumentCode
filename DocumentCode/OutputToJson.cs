@@ -25,7 +25,6 @@ namespace DocumentCode
                 DisplayConstructorAttr(t);
                 DisplayPropAttr(t);
                 DisplayMethodAttr(t);
-                Console.WriteLine();
 
                if (!string.IsNullOrEmpty(response.Name))
                 {
