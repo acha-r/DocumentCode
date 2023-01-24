@@ -1,19 +1,20 @@
 ﻿using DocumentTool;
 using System.Reflection;
 using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Xml;
 
 namespace DocumentCode
 {
-    [Document("This is a class of attributes")]
-    public class AttributesDisplay
+    internal class OutputToJson
     {
-        [Document("Constructor to create attribute")]
-        public AttributesDisplay()
-        {
+        static List<Response> response = new();
+        static string fileName = @"C:\Users\USER\Desktop\GetDocs.json";
 
-        }
         internal static void GetDocs()
         {
+            if (File.Exists(fileName)) File.Delete(fileName);
+
             Assembly assembly = Assembly.GetExecutingAssembly();
             Console.WriteLine("Assembly name: {0}", assembly.FullName);
 
@@ -27,22 +28,28 @@ namespace DocumentCode
                 DisplayMethodAttr(t);
                 Console.WriteLine();
             }
+           JsonFileUtils.WriteToJsonFile(response, fileName);
         }
+
 
         public static void DisplayTypeAttr(Type type)
         {
             DocumentAttribute documentAttribute = (DocumentAttribute)type.GetCustomAttribute(typeof(DocumentAttribute))!;
+
             if (documentAttribute != null && type.IsClass)
             {
-                Console.WriteLine($"Class: {type.Name}\n\tDescription: {documentAttribute.Description}\n");
+                var res = new Response(documentAttribute.Description, type.Name);                
+                response.Add(res);
             }
             else if (documentAttribute != null && type.IsEnum)
             {
-                Console.WriteLine($"Enum: {type.Name}\n\tDescription: {documentAttribute.Description}\n");
+                var res = new Response(documentAttribute.Description, type.Name);
+                response.Add(res);
             }
             else if (documentAttribute != null && type.IsInterface)
             {
-                Console.WriteLine($"Interface: {type.Name}\n\tDescription: {documentAttribute.Description}\n");
+                var res = new Response(documentAttribute.Description, type.Name);
+                response.Add(res);
             }
         }
 
@@ -54,19 +61,11 @@ namespace DocumentCode
             {
                 var documentAttribute = (DocumentAttribute)constructor.GetCustomAttribute(typeof(DocumentAttribute));
 
-                if (documentAttribute != null)
+                if (documentAttribute != null )
                 {
-                    Console.WriteLine($"\tConstructor:\n\t\t{constructor.Name}\n\t\tDescription: {documentAttribute.Description}\n");
-                }
-                if (!string.IsNullOrEmpty(documentAttribute?.Input))
-                {
-                    Console.WriteLine($"\t\tInput: {documentAttribute.Input}");
-                }
-
-                if (!string.IsNullOrEmpty(documentAttribute?.Output))
-                {
-                    Console.WriteLine($"\t\tInput: {documentAttribute.Output}");
-                }
+                    var res = new Response(documentAttribute.Description, constructor.Name);
+                    response.Add(res);
+                }             
             }
         }
 
@@ -80,7 +79,8 @@ namespace DocumentCode
 
                 if (documentAttribute != null)
                 {
-                    Console.WriteLine($"\tProperty:\n\t\t{property.Name}\n\t\tDescription: {documentAttribute.Description}\n");
+                    var res = new Response(documentAttribute.Description, property.Name);
+                    response.Add(res);
                 }
             }
         }
@@ -95,18 +95,54 @@ namespace DocumentCode
 
                 if (documentAttribute != null)
                 {
-                    Console.WriteLine($"\tMethod:\n\t\t{method.Name}\n\t\tDescription: {documentAttribute.Description}\n");
+                    var res = new Response()
+                    {
+                        Description = documentAttribute.Description,
+                        Name = method.Name
+                    };
+                    response.Add(res);
+                    JsonSerializer.Serialize(response);
                 }
                 if (!string.IsNullOrEmpty(documentAttribute?.Input))
                 {
-                    Console.WriteLine($"\t\tInput: {documentAttribute.Input}");
+                    var res = new Response()
+                    {
+                        Input = documentAttribute.Input
+                    };
+                    response.Add(res);
+                    JsonSerializer.Serialize(response);
                 }
-
                 if (!string.IsNullOrEmpty(documentAttribute?.Output))
                 {
-                    Console.WriteLine($"\t\tOutput: {documentAttribute.Output}");
+                    var res = new Response()
+                    {
+                        Output = documentAttribute.Output
+                    };
+                    response.Add(res);
+                    JsonSerializer.Serialize(response);
                 }
             }
         }
+
+        public class Response
+        {
+            public string Name { get; set; }
+            public string Description { get; set; }
+            public string Input { get; set; }
+            public string Output { get; set; }
+
+            public Response()
+            {
+
+            }
+            public Response(string name, string description, string input = "", string output ="")
+            {
+                Name = name;
+                Description = description;
+                Input = input;
+                Output = output;
+            }
+        }
     }
+    
 }

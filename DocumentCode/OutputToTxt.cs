@@ -1,20 +1,17 @@
 ﻿using DocumentTool;
 using System.Reflection;
-using System.Text.Json;
 
 namespace DocumentCode
 {
-    [Document("This is a class of attributes")]
-    public class AttributesDisplay
+    internal class OutputToTxt
     {
-        [Document("Constructor to create attribute")]
-        public AttributesDisplay()
-        {
+        static string fileName = @"C:\Users\USER\Desktop\GetDocs.txt";
 
-        }
         internal static void GetDocs()
         {
             Assembly assembly = Assembly.GetExecutingAssembly();
+
+            FileCheck();
             Console.WriteLine("Assembly name: {0}", assembly.FullName);
 
             Type[] types = assembly.GetTypes();
@@ -25,24 +22,25 @@ namespace DocumentCode
                 DisplayConstructorAttr(t);
                 DisplayPropAttr(t);
                 DisplayMethodAttr(t);
-                Console.WriteLine();
             }
+            Console.WriteLine(File.ReadAllText(fileName));
         }
 
         public static void DisplayTypeAttr(Type type)
         {
             DocumentAttribute documentAttribute = (DocumentAttribute)type.GetCustomAttribute(typeof(DocumentAttribute))!;
+
             if (documentAttribute != null && type.IsClass)
             {
-                Console.WriteLine($"Class: {type.Name}\n\tDescription: {documentAttribute.Description}\n");
+                File.AppendAllText(fileName, $"\nClass: {type.Name}\n\tDescription: {documentAttribute.Description}\n");
             }
             else if (documentAttribute != null && type.IsEnum)
             {
-                Console.WriteLine($"Enum: {type.Name}\n\tDescription: {documentAttribute.Description}\n");
+                File.AppendAllText(fileName, $"\nEnum: {type.Name}\n\tDescription: {documentAttribute.Description}\n");
             }
             else if (documentAttribute != null && type.IsInterface)
             {
-                Console.WriteLine($"Interface: {type.Name}\n\tDescription: {documentAttribute.Description}\n");
+                File.AppendAllText(fileName, $"\nInterface: {type.Name}\n\tDescription: {documentAttribute.Description}\n");
             }
         }
 
@@ -56,16 +54,16 @@ namespace DocumentCode
 
                 if (documentAttribute != null)
                 {
-                    Console.WriteLine($"\tConstructor:\n\t\t{constructor.Name}\n\t\tDescription: {documentAttribute.Description}\n");
+                    File.AppendAllText(fileName, $"\tConstructor:\n\t\t{constructor.Name}\n\t\tDescription: {documentAttribute.Description}\n");
                 }
                 if (!string.IsNullOrEmpty(documentAttribute?.Input))
                 {
-                    Console.WriteLine($"\t\tInput: {documentAttribute.Input}");
+                    File.AppendAllText(fileName, $"\t\tInput: {documentAttribute.Input}");
                 }
 
                 if (!string.IsNullOrEmpty(documentAttribute?.Output))
                 {
-                    Console.WriteLine($"\t\tInput: {documentAttribute.Output}");
+                    File.AppendAllText(fileName, $"\n\t\tOutput: {documentAttribute.Output}");
                 }
             }
         }
@@ -80,7 +78,7 @@ namespace DocumentCode
 
                 if (documentAttribute != null)
                 {
-                    Console.WriteLine($"\tProperty:\n\t\t{property.Name}\n\t\tDescription: {documentAttribute.Description}\n");
+                    File.AppendAllText(fileName, $"\tProperty:\n\t\t{property.Name}\n\t\tDescription: {documentAttribute.Description}\n");
                 }
             }
         }
@@ -95,18 +93,27 @@ namespace DocumentCode
 
                 if (documentAttribute != null)
                 {
-                    Console.WriteLine($"\tMethod:\n\t\t{method.Name}\n\t\tDescription: {documentAttribute.Description}\n");
+                    File.AppendAllText(fileName, $"\tMethod:\n\t\t{method.Name}\n\t\tDescription: {documentAttribute.Description}\n");
                 }
                 if (!string.IsNullOrEmpty(documentAttribute?.Input))
                 {
-                    Console.WriteLine($"\t\tInput: {documentAttribute.Input}");
+                    File.AppendAllText(fileName, $"\t\tInput: {documentAttribute.Input}");
                 }
 
                 if (!string.IsNullOrEmpty(documentAttribute?.Output))
                 {
-                    Console.WriteLine($"\t\tOutput: {documentAttribute.Output}");
+                    File.AppendAllText(fileName, $"\n\t\tOutput: {documentAttribute.Output}");
                 }
+            }
+        }
+
+        internal static void FileCheck()
+        {
+            if (File.Exists(fileName))
+            {
+                File.Delete(fileName);
             }
         }
     }
 }
+
