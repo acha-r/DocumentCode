@@ -10,7 +10,8 @@ namespace DocumentCode
         static void Main(string[] args)
         {
             //AttributesDisplay.GetDocs();
-            OutputToJson.GetDocs();            
+           // OutputToTxt.GetDocs();
+            //OutputToJson.GetDocs();            
         }
     }
 }
